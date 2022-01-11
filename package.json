@@ -9,14 +9,16 @@
     "remove:prod": "serverless remove --stage prod",
     "lint": "npx prettier --check 'src/**/*.{ts,tsx,js}'",
     "lint:fix": "npx prettier --write 'src/**/*.{ts,tsx,js}'",
-    "function:add": "cp -r ./src/functions/hello ./src/functions/new-function"
+    "function:add": "cp -r ./src/functions/template ./src/functions/newCommand"
   },
   "engines": {
     "node": ">=14.15.0"
   },
   "dependencies": {
     "@middy/core": "^2.5.3",
-    "@middy/http-json-body-parser": "^2.5.3"
+    "@middy/http-json-body-parser": "^2.5.3",
+    "dynamoose": "^2.8.3",
+    "telegraf": "^4.5.2"
   },
   "devDependencies": {
     "@serverless/typescript": "^2.23.0",
@@ -25,6 +27,7 @@
     "esbuild": "^0.14.11",
     "json-schema-to-ts": "^1.5.0",
     "serverless": "^2.23.0",
+    "serverless-dotenv-plugin": "^3.12.2",
     "serverless-esbuild": "^1.17.1",
     "ts-node": "^10.4.0",
     "tsconfig-paths": "^3.9.0",
