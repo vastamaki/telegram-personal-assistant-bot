@@ -4,7 +4,10 @@ export default {
   handler: `${handlerPath(__dirname)}/handler.main`,
   events: [
     {
-      httpApi: "GET /",
+      httpApi: "POST /",
     },
   ],
+  environment: {
+    BOT_TOKEN: process.env.BOT_TOKEN,
+  },
 };
