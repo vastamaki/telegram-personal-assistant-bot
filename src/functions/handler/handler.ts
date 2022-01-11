@@ -4,7 +4,7 @@ import { middyfy } from "@libs/lambda";
 import { Telegraf } from "telegraf";
 
 // Project imports
-import startCommand from "../../commands/start";
+import startCommand from "@commands/start";
 
 const bot = new Telegraf(process.env.BOT_TOKEN, {
   telegram: { webhookReply: true },
