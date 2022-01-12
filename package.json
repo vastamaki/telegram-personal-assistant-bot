@@ -17,6 +17,7 @@
   "dependencies": {
     "@middy/core": "^2.5.3",
     "@middy/http-json-body-parser": "^2.5.3",
+    "coinmarketcap-api": "^3.1.1",
     "dynamoose": "^2.8.3",
     "telegraf": "^4.5.2"
   },
