@@ -5,6 +5,7 @@ import { Telegraf } from "telegraf";
 
 // Project imports
 import startCommand from "@commands/start";
+import cmcCommand from "@commands/cmc-price";
 
 const bot = new Telegraf(process.env.BOT_TOKEN, {
   telegram: { webhookReply: true },
@@ -12,6 +13,8 @@ const bot = new Telegraf(process.env.BOT_TOKEN, {
 
 const handler: ValidatedEventAPIGatewayProxyEvent<any> = async (event) => {
   bot.command("/start", async (ctx) => await startCommand(ctx));
+
+  bot.command("/cmc", async (ctx) => await cmcCommand(ctx));
 
   bot.on(
     "message",

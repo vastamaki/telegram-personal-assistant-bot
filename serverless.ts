@@ -18,7 +18,7 @@ const serverlessConfiguration: AWS = {
     environment: {
       AWS_NODEJS_CONNECTION_REUSE_ENABLED: "1",
       NODE_OPTIONS: "--enable-source-maps --stack-trace-limit=1000",
-      USERS_TABLE_NAME: "${self:service}-users",
+      DYNAMODB_TABLE_NAME: "${self:service}",
     },
     lambdaHashingVersion: "20201221",
     iamRoleStatements: [
@@ -31,7 +31,7 @@ const serverlessConfiguration: AWS = {
           "dynamodb:PutItem",
           "dynamodb:DescribeTable",
         ],
-        Resource: { "Fn::GetAtt": ["UsersTable", "Arn"] },
+        Resource: { "Fn::GetAtt": ["DynamoTable", "Arn"] },
       },
     ],
   },
@@ -52,24 +52,32 @@ const serverlessConfiguration: AWS = {
   },
   resources: {
     Resources: {
-      UsersTable: {
+      DynamoTable: {
         Type: "AWS::DynamoDB::Table",
         Properties: {
-          TableName: "${self:provider.environment.USERS_TABLE_NAME}",
+          TableName: "${self:provider.environment.DYNAMODB_TABLE_NAME}",
           ProvisionedThroughput: {
             ReadCapacityUnits: 1,
             WriteCapacityUnits: 1,
           },
           AttributeDefinitions: [
             {
-              AttributeName: "userId",
+              AttributeName: "pk",
+              AttributeType: "S",
+            },
+            {
+              AttributeName: "sk",
               AttributeType: "S",
             },
           ],
           KeySchema: [
             {
-              AttributeName: "userId",
+              AttributeName: "pk",
               KeyType: "HASH",
+            },
+            {
+              AttributeName: "sk",
+              KeyType: "RANGE",
             },
           ],
         },
