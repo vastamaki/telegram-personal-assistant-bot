@@ -1,7 +1,0 @@
-{
-  "headers": {
-      "Content-Type": "application/json"
-  },
-  "body": "{\"update_id\":231457591,\n\"message\":{\"message_id\":7,\"from\":{\"id\":934342203,\"is_bot\":false,\"first_name\":\"Call me Pretty \\ud83e\\udd21\",\"username\":\"callmepretty\",\"language_code\":\"fi\"},\"chat\":{\"id\":934342203,\"first_name\":\"Call me Pretty \\ud83e\\udd21\",\"username\":\"callmepretty\",\"type\":\"private\"},\"date\":1642002368,\"text\":\"/weather\",\"entities\":[{\"offset\":0,\"length\":8,\"type\":\"bot_command\"}]}}",
-  "isBase64Encoded": false
-}

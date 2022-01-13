@@ -20,8 +20,6 @@ const bot = new Telegraf(process.env.BOT_TOKEN, {
 });
 
 const handler: ValidatedEventAPIGatewayProxyEvent<any> = async (event) => {
-  console.log(JSON.stringify(event));
-
   bot.command("/start", async (ctx) => await startCommand(ctx));
   bot.command("/setLocation", async (ctx) => await setLocationCommand(ctx));
   bot.command("/weather", async (ctx) => await weatherCommand(ctx));

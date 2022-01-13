@@ -24,8 +24,6 @@ export const handleSetLocation = async (ctx: any) => {
       throw Error("Reverse goecoding failed");
     }
 
-    console.log(`place: ${city}, ${country}`);
-
     await ddb.storeLocation({
       userId,
       location: { latitude, longitude, place: { city, country } },
@@ -39,9 +37,6 @@ export const handleSetLocation = async (ctx: any) => {
 };
 
 export default async (ctx: any) => {
-  // const user = await UserModel.get(
-  //   ctx.update.message.from.id.toString(),
-  // );
   const userId = ctx.update.message.from.id.toString();
 
   // waiting for location, but user sent command -> remove waiting for
