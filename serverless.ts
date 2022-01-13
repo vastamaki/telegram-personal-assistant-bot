@@ -10,7 +10,7 @@ const serverlessConfiguration: AWS = {
     name: "aws",
     runtime: "nodejs14.x",
     region: "eu-north-1",
-    profile: "personal",
+    // profile: "personal",
     apiGateway: {
       minimumCompressionSize: 1024,
       shouldStartNameWithService: true,
@@ -28,6 +28,7 @@ const serverlessConfiguration: AWS = {
           "dynamodb:Query",
           "dynamodb:GetItem",
           "dynamodb:UpdateItem",
+          "dynamodb:DeleteItem",
           "dynamodb:PutItem",
           "dynamodb:DescribeTable",
         ],
