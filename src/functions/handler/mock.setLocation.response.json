@@ -1,0 +1,7 @@
+{
+  "headers": {
+      "Content-Type": "application/json"
+  },
+  "body": "{\"update_id\":231457592,\n\"message\":{\"message_id\":10,\"from\":{\"id\":934342203,\"is_bot\":false,\"first_name\":\"Call me Pretty \\ud83e\\udd21\",\"username\":\"callmepretty\",\"language_code\":\"fi\"},\"chat\":{\"id\":934342203,\"first_name\":\"Call me Pretty \\ud83e\\udd21\",\"username\":\"callmepretty\",\"type\":\"private\"},\"date\":1642003422,\"location\":{\"latitude\":62.219446,\"longitude\":25.739059}}}",
+  "isBase64Encoded": false
+}

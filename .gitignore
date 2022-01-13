@@ -2,3 +2,4 @@ node_modules
 .serverless
 src/functions/newCommand
 .env
+.esbuild
