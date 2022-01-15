@@ -3,7 +3,7 @@ import { formatJSONResponse } from "@libs/apiGateway";
 import { middyfy } from "@libs/lambda";
 import * as ddb from "@libs/dynamodb";
 
-import { Telegraf } from "telegraf";
+import { Telegraf, Context } from "telegraf";
 
 // Project imports
 import startCommand from "@commands/start";
@@ -15,11 +15,48 @@ import {
 import weatherCommand from "@commands/weather";
 import emptyCommand from "@commands/empty";
 
+class CustomContext extends Context {
+  data: {
+    messageId: string;
+    date: Date;
+    text: string;
+    location: {
+      longitude: string;
+      latitude: string;
+    };
+    user: {
+      id: string;
+      username: string;
+      firstName: string;
+      lastName: string;
+    };
+  };
+}
+
 const bot = new Telegraf(process.env.BOT_TOKEN, {
   telegram: { webhookReply: true },
+  contextType: CustomContext,
 });
 
 const handler: ValidatedEventAPIGatewayProxyEvent<any> = async (event) => {
+  bot.use((ctx, next) => {
+    const {
+      update: { message },
+    } = ctx;
+    ctx.data = {
+      messageId: message.message_id,
+      date: message.date,
+      text: message.text,
+      location: message.location || {},
+      user: {
+        id: message.from.id.toString(),
+        username: message.from.username,
+        firstName: message.from.first_name,
+        lastName: message.from.last_name,
+      },
+    };
+    return next();
+  });
   bot.command("/start", async (ctx) => await startCommand(ctx));
   bot.command("/setLocation", async (ctx) => await setLocationCommand(ctx));
   bot.command("/weather", async (ctx) => await weatherCommand(ctx));
@@ -29,9 +66,10 @@ const handler: ValidatedEventAPIGatewayProxyEvent<any> = async (event) => {
   bot.command("/cmc", async (ctx) => await cmcCommand(ctx));
 
   bot.on("message", async (ctx) => {
+    const { data } = ctx;
     // check if there are replys to wait for
     const typeToWait = await ddb.getWaitingFor({
-      userId: ctx.update.message.from.id.toString(),
+      userId: data.user.id,
     });
 
     switch (typeToWait) {
@@ -39,7 +77,6 @@ const handler: ValidatedEventAPIGatewayProxyEvent<any> = async (event) => {
         await handleSetLocation(ctx);
         break;
     }
-    // ctx.telegram.sendCopy(ctx.chat.id, ctx.message)
   });
 
   await bot.handleUpdate(event.body);

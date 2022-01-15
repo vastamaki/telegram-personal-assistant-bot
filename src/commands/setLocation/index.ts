@@ -8,17 +8,18 @@ const geocoder = NodeGeocoder({
 
 export const handleSetLocation = async (ctx: any) => {
   try {
-    const userId = ctx.update.message.from.id.toString();
-    const { latitude, longitude } = ctx.update?.message?.location || {};
+    const { data } = ctx;
+    const userId = data.user.id;
+    const { latitude, longitude } = data.location;
 
     if (!latitude || !longitude) {
       throw Error("Latitude and/or longitude missing");
     }
 
-    const [{ city, country }] = (await geocoder.reverse({
+    const [{ city, country }] = await geocoder.reverse({
       lat: latitude,
       lon: longitude,
-    })) || [{}];
+    });
 
     if (!city || !country) {
       throw Error("Reverse goecoding failed");
@@ -31,13 +32,14 @@ export const handleSetLocation = async (ctx: any) => {
     await ddb.removeWaitingFor({ userId });
     await ctx.reply("Great, location saved!");
   } catch (error) {
-    console.error();
+    console.error(error);
     await ctx.reply("Setting location failed. :'(");
   }
 };
 
 export default async (ctx: any) => {
-  const userId = ctx.update.message.from.id.toString();
+  const { data } = ctx;
+  const userId = data.user.id;
 
   // waiting for location, but user sent command -> remove waiting for
   if (await ddb.getWaitingFor({ userId })) {
@@ -47,7 +49,7 @@ export default async (ctx: any) => {
   }
 
   await ddb.storeWaitingFor({
-    userId: ctx.update.message.from.id.toString(),
+    userId: userId,
     type: "location",
   });
   await ctx.reply(
