@@ -1,34 +1,62 @@
+import { CustomContext } from "@functions/handler/handler";
 import { getUser } from "@libs/dynamodb";
-import { getForecast } from "@libs/weather-api";
+import { getLegends, getForecast } from "@libs/weather-api";
 
-export default async (ctx: any) => {
-  const user = await getUser({ userId: ctx.update.message.from.id.toString() });
-
-  if (!user?.location) {
-    await ctx.reply(
-      "You need to set up the location with /setLocation to use /weather command."
-    );
-    return;
-  }
-
+export default async (ctx: CustomContext) => {
   try {
-    const { properties }: any = await getForecast(user.location);
+    const user = await getUser({ userId: ctx.data.user.id });
 
-    const airTemperatureUnit = properties.meta.units.air_temperature;
-    const { data } = properties.timeseries[0] || {};
-    const airTemperature: string =
-      data.instant.details.air_temperature.toString();
-
-    if (!airTemperature || !airTemperatureUnit) {
-      throw Error("Temperature fetching failed");
+    if (!user?.location) {
+      await ctx.reply(
+        "You need to set up the location with /setLocation to use /weather command."
+      );
+      return;
     }
+
+    const [forecast, legends]: any = await Promise.all([
+      getForecast(user.location),
+      getLegends(),
+    ]);
+
+    const { data } = forecast.properties.timeseries[0];
+
+    const units = forecast.properties.meta.units;
+    const details = data.instant.details;
+    // clean _night, _day etc suffix from summary
+    const [sixHSummary] = (
+      data.next_6_hours.summary.symbol_code as string
+    ).split("_");
+
+    const weather = {
+      airTemperature: {
+        unit: units.air_temperature,
+        value: details.air_temperature.toString(),
+      },
+      wind: {
+        unit: units.wind_speed,
+        value: details.wind_speed,
+      },
+      windOfGust: {
+        value: details.wind_speed_of_gust,
+      },
+      nextSixHours: {
+        value: legends[sixHSummary]?.desc_en || sixHSummary,
+      },
+    };
 
     const { city, country } = user.location.place;
 
-    await ctx.reply(`
-      ${city}, ${country}
-      Temperature now: ${airTemperature} ${airTemperatureUnit}
-    `);
+    await ctx.reply(
+      `${city}, ${country} 🌡️ 🌬️
+
+      _* Air temperature: ${weather.airTemperature.value} ${weather.airTemperature.unit}_
+      _* Wind: ${weather.wind.value} ${weather.wind.unit}_
+      _* Wind of gust: ${weather.windOfGust.value} ${weather.wind.unit}_
+      _* Next 6 hours: ${weather.nextSixHours.value}_`,
+      {
+        parse_mode: "Markdown",
+      }
+    );
   } catch (error) {
     console.error(error);
     await ctx.reply("Weather forecast fetching failed :/");

@@ -15,7 +15,7 @@ import {
 import weatherCommand from "@commands/weather";
 import emptyCommand from "@commands/empty";
 
-class CustomContext extends Context {
+export class CustomContext extends Context {
   data: {
     messageId: string;
     date: Date;
@@ -42,7 +42,7 @@ const handler: ValidatedEventAPIGatewayProxyEvent<any> = async (event) => {
   bot.use((ctx, next) => {
     const {
       update: { message },
-    } = ctx;
+    } = ctx as any;
     ctx.data = {
       messageId: message.message_id,
       date: message.date,
