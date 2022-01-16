@@ -22,6 +22,10 @@ export default async (ctx: CustomContext) => {
 
     const units = forecast.properties.meta.units;
     const details = data.instant.details;
+    // clean _night, _day etc suffix from summary
+    const [sixHSummary] = (
+      data.next_6_hours.summary.symbol_code as string
+    ).split("_");
 
     const weather = {
       airTemperature: {
@@ -36,7 +40,7 @@ export default async (ctx: CustomContext) => {
         value: details.wind_speed_of_gust,
       },
       nextSixHours: {
-        value: legends[data.next_6_hours.summary.symbol_code].desc_en,
+        value: legends[sixHSummary]?.desc_en || sixHSummary,
       },
     };
 

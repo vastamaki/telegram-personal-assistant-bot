@@ -1,4 +1,4 @@
-import fetch from "node-fetch";
+import { fetch } from "@libs/misc";
 
 const weatherApiUrl = "https://api.met.no/weatherapi/";
 const endpoints = {
@@ -22,11 +22,9 @@ export const getForecast = async ({ latitude, longitude }) => {
   return fetch(
     `${weatherApiUrl + endpoints.forecast}?lat=${latitude}&lon=${longitude}`,
     options
-  ).then((res) => res.json());
+  );
 };
 
 export const getLegends = async () => {
-  return fetch(`${weatherApiUrl + endpoints.legends}`, options).then((res) =>
-    res.json()
-  );
+  return fetch(`${weatherApiUrl + endpoints.legends}`, options);
 };
