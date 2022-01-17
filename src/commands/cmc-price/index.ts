@@ -26,21 +26,24 @@ export default async (ctx: any) => {
 };
 
 const getCryptoValues = async (ctx: any) => {
-  const cryptos = await getCryptocurrenices({ userId: ctx.data.user.id });
+  const cryptos = await getCryptocurrencies({ userId: ctx.data.user.id });
 
   try {
     const { data } = await cmc_client.getQuotes({ symbol: cryptos });
-    let message = ``;
+    const message = `
+    ${Object.keys(data)
+      .map((key: any) => {
+        const {
+          name,
+          quote: { USD },
+        } = data[key];
+        const price =
+          USD.price < 1 ? USD.price : parseFloat(USD.price).toFixed(2);
+        return `_${name} ${price}_`;
+      })
+      .join("\n")}
+    `;
 
-    Object.keys(data).forEach((key) => {
-      const {
-        name,
-        quote: { USD },
-      } = data[key];
-      const price =
-        USD.price < 1 ? USD.price : parseFloat(USD.price).toFixed(2);
-      message += `_${name} ${price}_ \n`;
-    });
     await ctx.reply(message, {
       parse_mode: "Markdown",
     });
