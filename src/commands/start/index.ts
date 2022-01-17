@@ -10,8 +10,11 @@ export default async (ctx: any) => {
 
     await ctx.reply("Hey there! You are now registered! :)");
   } catch (err) {
-    console.error(err);
-
-    await ctx.reply("Oops.. Something went wrong :(");
+    if (err.code === "ConditionalCheckFailedException") {
+      await ctx.reply("You are already registered! :)");
+    } else {
+      console.error(err);
+      await ctx.reply("Oops.. Something went wrong :(");
+    }
   }
 };
