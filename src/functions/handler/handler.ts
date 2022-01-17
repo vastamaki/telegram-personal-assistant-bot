@@ -24,6 +24,7 @@ export class CustomContext extends Context {
       longitude: string;
       latitude: string;
     };
+    args: string[];
     user: {
       id: string;
       username: string;
@@ -48,6 +49,7 @@ const handler: ValidatedEventAPIGatewayProxyEvent<any> = async (event) => {
       date: message.date,
       text: message.text,
       location: message.location || {},
+      args: message.text?.split(" ").slice(1),
       user: {
         id: message.from.id.toString(),
         username: message.from.username,
