@@ -1,12 +1,12 @@
 import {
-  getCryptocurrenices,
+  getCryptocurrencies,
   removeStoredCrypto,
   storeNewCrypto,
 } from "@libs/dynamodb";
 
 const { CMC_API_KEY } = process.env;
 
-const CoinMarketCap = require("coinmarketcap-api");
+import CoinMarketCap from "coinmarketcap-api";
 const cmc_client = new CoinMarketCap(CMC_API_KEY);
 
 export default async (ctx: any) => {

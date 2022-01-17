@@ -156,7 +156,7 @@ export const removeLocation = async ({ userId }: { userId: string }) => {
   );
 };
 
-export const getCryptocurrenices = async ({ userId }) => {
+export const getCryptocurrencies = async ({ userId }) => {
   return (await Model.get({ pk: "user", sk: userId })).cryptos;
 };
 
