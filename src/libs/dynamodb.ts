@@ -40,7 +40,8 @@ const schema = new dynamoose.Schema(
       type: String,
     },
     cryptos: {
-      type: String,
+      type: Array,
+      schema: [String],
     },
     location: {
       type: Object,
@@ -69,6 +70,8 @@ export const registerUser = async ({ username, userId }) => {
     pk: "user",
     sk: userId,
     username,
+    cryptos: [],
+    location: {},
   });
 
   await user.save({
@@ -153,14 +156,42 @@ export const removeLocation = async ({ userId }: { userId: string }) => {
   );
 };
 
-export const storeNewCrypto = async ({ userId, symbol }) => {
+export const getCryptocurrencies = async ({ userId }) => {
+  return (await Model.get({ pk: "user", sk: userId })).cryptos;
+};
+
+export const storeNewCrypto = async ({
+  userId,
+  symbol,
+}: {
+  userId: string;
+  symbol: string;
+}) => {
   await Model.update(
     {
       pk: "user",
       sk: userId,
     },
+    { $ADD: { cryptos: symbol } } as any
+  );
+};
+
+export const removeStoredCrypto = async ({
+  userId,
+  symbol,
+}: {
+  userId: string;
+  symbol: string;
+}) => {
+  const cryptos = (await Model.get({ pk: "user", sk: userId })).cryptos;
+
+  const filteredList = cryptos.filter((name) => name !== symbol);
+
+  await Model.update(
     {
-      $ADD: { cryptos: [symbol] },
-    } as any
+      pk: "user",
+      sk: userId,
+    },
+    { cryptos: filteredList }
   );
 };
