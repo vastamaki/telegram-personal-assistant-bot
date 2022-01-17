@@ -1,12 +1,13 @@
 import * as ddb from "@libs/dynamodb";
 import NodeGeocoder from "node-geocoder";
+import { CustomContext } from "@functions/handler/handler";
 
 const geocoder = NodeGeocoder({
   provider: "google",
   apiKey: process.env.GOOGLE_GEOCODING_API_KEY,
 });
 
-export const handleSetLocation = async (ctx: any) => {
+export const handleSetLocation = async (ctx: CustomContext) => {
   try {
     const { data } = ctx;
     const userId = data.user.id;
@@ -37,7 +38,7 @@ export const handleSetLocation = async (ctx: any) => {
   }
 };
 
-export default async (ctx: any) => {
+export default async (ctx: CustomContext) => {
   const { data } = ctx;
   const userId = data.user.id;
 

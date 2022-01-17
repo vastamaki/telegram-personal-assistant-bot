@@ -1,7 +1,8 @@
 import * as ddb from "@libs/dynamodb";
+import { CustomContext } from "@functions/handler/handler";
 
-export default async (ctx: any) => {
-  const userId = ctx.update.message.from.id.toString();
+export default async (ctx: CustomContext) => {
+  const userId = ctx.update.message.from.id;
   const typeToWait = await ddb.getWaitingFor({
     userId,
   });
