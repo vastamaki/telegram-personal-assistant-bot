@@ -15,6 +15,7 @@ import {
 import weatherCommand from "@commands/weather";
 import emptyCommand from "@commands/empty";
 import reminderCommand from "@commands/reminder";
+import reloadCommand from "@commands/reload";
 
 export class CustomContext extends Context {
   data: {
@@ -63,14 +64,19 @@ const handler: ValidatedEventAPIGatewayProxyEvent<any> = async (event) => {
       return next();
     });
     bot.command("/start", async (ctx) => await startCommand(ctx));
-    bot.command("/setLocation", async (ctx) => await setLocationCommand(ctx));
+    bot.command("/set_location", async (ctx) => await setLocationCommand(ctx));
     bot.command("/weather", async (ctx) => await weatherCommand(ctx));
 
     bot.command("/empty", async (ctx) => await emptyCommand(ctx));
 
     bot.command("/cmc", async (ctx) => await cmcCommand(ctx));
 
-    bot.command("/remind", async (ctx) => await reminderCommand(ctx, event));
+    bot.command("/remind", async (ctx) => await reminderCommand(ctx));
+
+    bot.command("/reload", async (ctx) => {
+      await reloadCommand(ctx);
+      await ctx.reply("Commands reloaded!");
+    });
 
     bot.on("message", async (ctx) => {
       const { data } = ctx;
