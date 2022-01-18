@@ -4,12 +4,14 @@ import {
   storeNewCrypto,
 } from "@libs/dynamodb";
 
+import { CustomContext } from "@functions/handler/handler";
+
 const { CMC_API_KEY } = process.env;
 
 import CoinMarketCap from "coinmarketcap-api";
 const cmc_client = new CoinMarketCap(CMC_API_KEY);
 
-export default async (ctx: any) => {
+export default async (ctx: CustomContext) => {
   const { data } = ctx;
 
   switch (data.args[0]) {
@@ -25,20 +27,36 @@ export default async (ctx: any) => {
   }
 };
 
-const getCryptoValues = async (ctx: any) => {
+interface CoinMarketCapData {
+  data: {
+    [key: string]: CMCData;
+  };
+}
+
+interface CMCData {
+  name: string;
+  quote: {
+    USD: {
+      price: number;
+    };
+  };
+}
+
+const getCryptoValues = async (ctx: CustomContext) => {
   const cryptos = await getCryptocurrencies({ userId: ctx.data.user.id });
 
   try {
-    const { data } = await cmc_client.getQuotes({ symbol: cryptos });
+    const { data }: CoinMarketCapData = await cmc_client.getQuotes({
+      symbol: cryptos,
+    });
     const message = `
     ${Object.keys(data)
-      .map((key: any) => {
+      .map((key: string) => {
         const {
           name,
           quote: { USD },
         } = data[key];
-        const price =
-          USD.price < 1 ? USD.price : parseFloat(USD.price).toFixed(2);
+        const price = USD.price < 1 ? USD.price : USD.price.toFixed(2);
         return `_${name} ${price}_`;
       })
       .join("\n")}
@@ -53,21 +71,23 @@ const getCryptoValues = async (ctx: any) => {
   }
 };
 
-const addCrypto = async (ctx: any) => {
+const addCrypto = async (ctx: CustomContext) => {
   try {
-    const { data } = await cmc_client.getQuotes({ symbol: ctx.data.args[1] });
+    const { data }: CoinMarketCap = await cmc_client.getQuotes({
+      symbol: ctx.data.args[1],
+    });
 
-    if (data) {
-      await storeNewCrypto({
-        userId: ctx.data.user.id,
-        symbol: ctx.data.args[1],
-      });
-      await ctx.reply(`I added ${ctx.data.args[1]} to your watchlist! :)`);
-    } else {
-      await ctx.reply(
+    if (!data) {
+      return ctx.reply(
         `Looks like ${ctx.data.args[1]} doesn't exist on CoinMarketCap yet :(`
       );
     }
+    
+    await storeNewCrypto({
+      userId: ctx.data.user.id,
+      symbol: ctx.data.args[1],
+    });
+    await ctx.reply(`I added ${ctx.data.args[1]} to your watchlist! :)`);
   } catch (err) {
     console.error(err);
     await ctx.reply(
@@ -76,7 +96,7 @@ const addCrypto = async (ctx: any) => {
   }
 };
 
-const removeCrypto = async (ctx: any) => {
+const removeCrypto = async (ctx: CustomContext) => {
   try {
     await removeStoredCrypto({
       userId: ctx.data.user.id,

@@ -1,16 +1,26 @@
 import type { AWS } from "@serverless/typescript";
 
 import handler from "@functions/handler";
+import reminder from "@functions/reminder";
 
-const serverlessConfiguration: AWS = {
+interface CustomAWS extends AWS {
+  stepFunctions: any;
+}
+
+const serverlessConfiguration: CustomAWS = {
   service: "telegram-personal-assistant-bot",
   frameworkVersion: "2",
-  plugins: ["serverless-esbuild", "serverless-dotenv-plugin"],
+  plugins: [
+    "serverless-esbuild",
+    "serverless-dotenv-plugin",
+    "serverless-step-functions",
+  ],
   provider: {
     name: "aws",
     runtime: "nodejs14.x",
     region: "eu-north-1",
-    // profile: "personal",
+    profile: "personal",
+    stage: "${opt:stage, 'dev'}",
     apiGateway: {
       minimumCompressionSize: 1024,
       shouldStartNameWithService: true,
@@ -19,6 +29,9 @@ const serverlessConfiguration: AWS = {
       AWS_NODEJS_CONNECTION_REUSE_ENABLED: "1",
       NODE_OPTIONS: "--enable-source-maps --stack-trace-limit=1000",
       DYNAMODB_TABLE_NAME: "${self:service}",
+      REMINDER_FUNCTION_ARN: {
+        "Fn::GetAtt": ["ReminderMachineStepFunctionsStateMachine", "Arn"],
+      },
     },
     lambdaHashingVersion: "20201221",
     iamRoleStatements: [
@@ -34,10 +47,57 @@ const serverlessConfiguration: AWS = {
         ],
         Resource: { "Fn::GetAtt": ["DynamoTable", "Arn"] },
       },
+      {
+        Effect: "Allow",
+        Action: ["states:StartExecution"],
+        Resource: {
+          "Fn::GetAtt": ["ReminderMachineStepFunctionsStateMachine", "Arn"],
+        },
+      },
     ],
   },
   // import the function via paths
-  functions: { handler },
+  functions: { handler, reminder },
+  stepFunctions: {
+    stateMachines: {
+      reminderMachine: {
+        definition: {
+          Comment: "Reminder wait state",
+          StartAt: "Wait",
+          States: {
+            Wait: {
+              Type: "Wait",
+              SecondsPath: "$.expiry",
+              Next: "sendReminder",
+            },
+            sendReminder: {
+              Type: "Task",
+              Resource: {
+                "Fn::Join": [
+                  "",
+                  [
+                    "arn:aws:lambda:",
+                    {
+                      Ref: "AWS::Region",
+                    },
+                    ":",
+                    {
+                      Ref: "AWS::AccountId",
+                    },
+                    ":function:",
+                    "${self:service}",
+                    "-${self:provider.stage}",
+                    "-reminder",
+                  ],
+                ],
+              },
+              End: true,
+            },
+          },
+        },
+      },
+    },
+  },
   package: { individually: true },
   custom: {
     esbuild: {

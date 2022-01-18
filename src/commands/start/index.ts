@@ -1,6 +1,7 @@
 import { registerUser } from "@libs/dynamodb";
+import { CustomContext } from "@functions/handler/handler";
 
-export default async (ctx: any) => {
+export default async (ctx: CustomContext) => {
   const { data } = ctx;
   try {
     await registerUser({
