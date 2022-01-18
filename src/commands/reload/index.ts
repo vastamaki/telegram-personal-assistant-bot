@@ -23,7 +23,7 @@ export default async (ctx: CustomContext) => {
     {
       command: "cmc",
       description:
-        "Usage: /cmc add {symbol}, /cmc remove {symbol}, /cmc, returns cryptocurency prices based on stored data to the user",
+        "Usage: /cmc add {symbol}, /cmc remove {symbol}, /cmc, returns cryptocurrency prices based on stored data to the user",
     },
     {
       command: "reload",
