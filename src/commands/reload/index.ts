@@ -14,7 +14,16 @@ export default async (ctx: CustomContext) => {
     {
       command: "weather",
       description:
-        "Returns weather based on location stored using /setLocation command",
+        "Returns weather based on location stored using /set_location command",
+    },
+    {
+      command: "set_rss",
+      description: "Allows user to store rss urls for /rss command",
+    },
+    {
+      command: "rss",
+      description:
+        "Returns titles and links of rss feeds that user has stored using /set_rss command",
     },
     {
       command: "empty",
