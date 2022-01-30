@@ -8,7 +8,7 @@ export default async (ctx: CustomContext) => {
 
     if (!user?.location) {
       await ctx.reply(
-        "You need to set up the location with /setLocation to use /weather command."
+        "You need to set up the location with /set_location to use /weather command."
       );
       return;
     }
