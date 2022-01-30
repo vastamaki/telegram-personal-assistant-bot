@@ -18,6 +18,7 @@ export class DynamoModel extends Document {
   username: string;
   type?: string;
   cryptos: string[];
+  rss: string[];
   location: ILocation;
   createdAt: number;
   updatedAt: number;
@@ -40,6 +41,10 @@ const schema = new dynamoose.Schema(
       type: String,
     },
     cryptos: {
+      type: Array,
+      schema: [String],
+    },
+    rss: {
       type: Array,
       schema: [String],
     },
@@ -71,6 +76,7 @@ export const registerUser = async ({ username, userId }) => {
     sk: userId,
     username,
     cryptos: [],
+    rss: [],
     location: {},
   });
 
@@ -194,4 +200,34 @@ export const removeStoredCrypto = async ({
     },
     { cryptos: filteredList }
   );
+};
+
+export const storeRss = async ({
+  userId,
+  rssUrls,
+}: {
+  userId: string;
+  rssUrls: string[];
+}) => {
+  await Model.update(
+    {
+      pk: "user",
+      sk: userId,
+    },
+    { rss: rssUrls }
+  );
+};
+
+export const removeRss = async ({ userId }: { userId: string }) => {
+  await Model.update(
+    {
+      pk: "user",
+      sk: userId,
+    },
+    { rss: [] }
+  );
+};
+
+export const getRss = async ({ userId }) => {
+  return (await Model.get({ pk: "user", sk: userId })).rss;
 };
