@@ -54,6 +54,6 @@ export default async (ctx: CustomContext) => {
     type: "location",
   });
   await ctx.reply(
-    "Ok, send your location so we can save it for later use. Use /setLocation command again to cancel, /empty command to remove the current information."
+    "Ok, send your location so we can save it for later use. Use /set_location command again to cancel, /empty command to remove the current information."
   );
 };
