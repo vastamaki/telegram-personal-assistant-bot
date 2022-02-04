@@ -12,7 +12,9 @@ import {
   default as setLocationCommand,
   handleSetLocation,
 } from "@commands/setLocation";
+import { default as setRssCommand, handleSetRss } from "@commands/setRss";
 import weatherCommand from "@commands/weather";
+import rssCommand from "@commands/rss";
 import emptyCommand from "@commands/empty";
 import reminderCommand from "@commands/reminder";
 import reloadCommand from "@commands/reload";
@@ -23,8 +25,8 @@ export class CustomContext extends Context {
     date: Date;
     text: string;
     location: {
-      longitude: string;
-      latitude: string;
+      longitude: number;
+      latitude: number;
     };
     args: string[];
     user: {
@@ -47,7 +49,7 @@ const handler: ValidatedEventAPIGatewayProxyEvent<any> = async (event) => {
       console.log(ctx);
       const {
         update: { message },
-      } = ctx;
+      } = ctx as any;
       ctx.data = {
         messageId: message.message_id,
         date: message.date,
@@ -66,6 +68,8 @@ const handler: ValidatedEventAPIGatewayProxyEvent<any> = async (event) => {
     bot.command("/start", async (ctx) => await startCommand(ctx));
     bot.command("/set_location", async (ctx) => await setLocationCommand(ctx));
     bot.command("/weather", async (ctx) => await weatherCommand(ctx));
+    bot.command("/set_rss", async (ctx) => await setRssCommand(ctx));
+    bot.command("/rss", async (ctx) => await rssCommand(ctx));
 
     bot.command("/empty", async (ctx) => await emptyCommand(ctx));
 
@@ -88,6 +92,9 @@ const handler: ValidatedEventAPIGatewayProxyEvent<any> = async (event) => {
       switch (typeToWait) {
         case "location":
           await handleSetLocation(ctx);
+          break;
+        case "rss":
+          await handleSetRss(ctx);
           break;
       }
     });
